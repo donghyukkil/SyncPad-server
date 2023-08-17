@@ -8,6 +8,11 @@ const userSchema = Schema({
     required: true,
     unique: true,
   },
+  token: {
+    type: String,
+    required: true,
+    unique: true,
+  },
 
   texts: [
     {
