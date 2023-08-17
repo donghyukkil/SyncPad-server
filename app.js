@@ -5,37 +5,40 @@ const createError = require("http-errors");
 const express = require("express");
 const cors = require("cors");
 const logger = require("morgan");
+const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 
 const app = express();
 
-const mongoose = require("mongoose");
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 const { CONFIG } = require("./constants/config");
 
 const connectToDatabase = async () => {
   try {
     await mongoose.connect(CONFIG.MONGODB_URI);
-    console.log("connected");
+    console.log("MongoDB connected");
   } catch (error) {
-    console.log("failed");
+    console.error("MongoDB connection failed:", error);
   }
 };
 
 connectToDatabase();
 
-app.use(
-  cors({
-    origin: "*",
-  }),
-);
-
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
@@ -53,7 +56,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  res.json({ error: err.message }); // JSON 형식으로 에러 메시지 전송
 });
 
 module.exports = app;
