@@ -9,15 +9,21 @@ exports.post = async (req, res, next) => {
 
   try {
     const existingUser = await User.findOne({ email: userEmail });
+
     if (!existingUser) {
+      const token = jwt.sign({ email: userEmail }, CONFIG.SECRETKEY);
+
       const newUser = new User({
         email: userEmail,
+        token,
       });
 
       await newUser.save();
 
-      const token = jwt.sign({ email: userEmail }, CONFIG.SECRETKEY, {
-        expiresIn: "1h",
+      res.cookie("accessToken", token, {
+        httpOnly: true,
+        sameSite: "Lax",
+        maxAge: 3600000,
       });
 
       res.json({
@@ -25,10 +31,17 @@ exports.post = async (req, res, next) => {
         message: "Created",
         data: {
           result: "OK",
-          token,
         },
       });
+
+      return;
     }
+
+    res.cookie("accessToken", existingUser.token, {
+      httpOnly: true,
+      sameSite: "Lax",
+      maxAge: 3600000,
+    });
 
     res.json({
       status: 200,
