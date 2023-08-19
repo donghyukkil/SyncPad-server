@@ -7,6 +7,7 @@ const textsController = require("../controllers/texts.controller");
 
 router.post("/", loginController.post);
 
-router.post("/:userId/texts", textsController.createTexts);
+router.post("/:userId/create", textsController.createText);
+router.post("/:userId/upload", textsController.uploadText);
 
 module.exports = router;
