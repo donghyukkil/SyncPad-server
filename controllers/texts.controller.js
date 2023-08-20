@@ -135,3 +135,71 @@ exports.uploadText = async (req, res, next) => {
     );
   }
 };
+
+exports.getTexts = async (req, res, next) => {
+  const { per_page, page } = req.query;
+  const { userId } = req.params;
+
+  if (isNaN(per_page) || isNaN(page)) {
+    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+
+    return;
+  }
+
+  if (!isUserIdValid(userId)) {
+    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+
+    return;
+  }
+
+  try {
+    const user = await User.findOne({ email: userId });
+
+    if (!user) {
+      next(createError(StatusCodes.NOT_FOUND, ReasonPhrases.NOT_FOUND));
+
+      return;
+    }
+
+    const perPageNumber = Number(per_page) || 6;
+    const pageNuber = Number(page) || 1;
+
+    const startIndex = (pageNuber - 1) * perPageNumber;
+    const endIndex = startIndex + perPageNumber;
+
+    const getTexts = async () => {
+      try {
+        const texts = await Text.find({ userId: user._id });
+
+        const totalItems = texts.length;
+        const totalPages = Math.ceil(totalItems / perPageNumber);
+
+        const sliceTexts = texts.slice(startIndex, endIndex);
+
+        res.json({
+          status: 200,
+          message: "Success",
+          data: sliceTexts,
+          totalItems,
+          totalPages,
+        });
+      } catch (error) {
+        next(
+          createError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            ReasonPhrases.INTERNAL_SERVER_ERROR,
+          ),
+        );
+      }
+    };
+
+    getTexts();
+  } catch (error) {
+    next(
+      createError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        ReasonPhrases.INTERNAL_SERVER_ERROR,
+      ),
+    );
+  }
+};
