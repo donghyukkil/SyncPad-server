@@ -107,6 +107,7 @@ exports.uploadText = async (req, res, next) => {
           });
 
           await text.save();
+
           res.json({
             status: 201,
             message: "Text created successfully",
@@ -140,17 +141,17 @@ exports.getTexts = async (req, res, next) => {
   const { per_page, page } = req.query;
   const { userId } = req.params;
 
-  if (isNaN(per_page) || isNaN(page)) {
-    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+  // if (isNaN(per_page) || isNaN(page)) {
+  //   next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
 
-    return;
-  }
+  //   return;
+  // }
 
-  if (!isUserIdValid(userId)) {
-    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+  // if (!isUserIdValid(userId)) {
+  //   next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
 
-    return;
-  }
+  //   return;
+  // }
 
   try {
     const user = await User.findOne({ email: userId });
