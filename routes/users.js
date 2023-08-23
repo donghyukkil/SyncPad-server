@@ -6,6 +6,7 @@ const loginController = require("../controllers/login.controller");
 const textsController = require("../controllers/texts.controller");
 
 router.post("/", loginController.post);
+router.post("/logout", loginController.logout);
 
 router.post("/:userId/create", textsController.createText);
 router.post("/:userId/upload", textsController.uploadText);
