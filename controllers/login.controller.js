@@ -54,3 +54,15 @@ exports.post = async (req, res, next) => {
     console.log(error.message);
   }
 };
+
+exports.logout = async (req, res, next) => {
+  res.clearCookie("accessToken");
+
+  res.send({
+    status: 200,
+    message: "Logged out successfully",
+    data: {
+      result: "ok",
+    },
+  });
+};
