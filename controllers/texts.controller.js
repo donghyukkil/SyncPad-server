@@ -204,3 +204,31 @@ exports.getTexts = async (req, res, next) => {
     );
   }
 };
+
+exports.putText = async (req, res, next) => {
+  const { userId, textId } = req.params;
+  const { content } = req.body;
+
+  const updateText = async () => {
+    try {
+      const text = await Text.findById({ _id: textId });
+      text.content = content;
+
+      await text.save();
+
+      res.json({
+        status: 200,
+        message: "Text 업데이트 성공",
+        text: {
+          _id: textId,
+          userEmail: userId,
+          content,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  updateText();
+};
