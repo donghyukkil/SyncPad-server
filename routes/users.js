@@ -11,5 +11,6 @@ router.post("/logout", loginController.logout);
 router.post("/:userId/create", textsController.createText);
 router.post("/:userId/upload", textsController.uploadText);
 router.get("/:userId/texts", textsController.getTexts);
+router.put("/:userId/texts/:textId", textsController.putText);
 
 module.exports = router;
