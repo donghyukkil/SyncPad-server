@@ -232,3 +232,32 @@ exports.putText = async (req, res, next) => {
 
   updateText();
 };
+
+exports.deleteText = async (req, res, next) => {
+  const { textId } = req.params;
+
+  const deleteText = async () => {
+    try {
+      const deletedText = await Text.findByIdAndDelete({ _id: textId });
+
+      if (!deleteText) {
+        return next(
+          createError(StatusCodes.NOT_FOUND, ReasonPhrases.NOT_FOUND),
+        );
+      }
+
+      res.json({
+        status: 204,
+        message: "텍스트 삭제 성공",
+        data: null,
+      });
+    } catch (error) {
+      createError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        ReasonPhrases.INTERNAL_SERVER_ERROR,
+      );
+    }
+  };
+
+  deleteText();
+};
