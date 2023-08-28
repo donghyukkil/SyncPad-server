@@ -8,6 +8,7 @@ const app = require("../app");
 const debug = require("debug")("server:server");
 const http = require("http");
 const { Server } = require("socket.io");
+const { CONFIG } = require("../constants/config");
 
 /**
  * Get port from environment and store in Express.
@@ -24,7 +25,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: CONFIG.CLIENT,
   },
 });
 
@@ -36,7 +37,7 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
+    console.log("User disconnected");
   });
 });
 
