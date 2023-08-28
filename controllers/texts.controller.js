@@ -19,12 +19,6 @@ exports.createText = async (req, res, next) => {
     return;
   }
 
-  if (typeof content !== "string") {
-    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
-
-    return;
-  }
-
   try {
     const user = await User.findOne({ email: userId });
 
@@ -141,17 +135,17 @@ exports.getTexts = async (req, res, next) => {
   const { per_page, page } = req.query;
   const { userId } = req.params;
 
-  // if (isNaN(per_page) || isNaN(page)) {
-  //   next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+  if (isNaN(per_page) || isNaN(page)) {
+    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
 
-  //   return;
-  // }
+    return;
+  }
 
-  // if (!isUserIdValid(userId)) {
-  //   next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
+  if (!isUserIdValid(userId)) {
+    next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
 
-  //   return;
-  // }
+    return;
+  }
 
   try {
     const user = await User.findOne({ email: userId });
