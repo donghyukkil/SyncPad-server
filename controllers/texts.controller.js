@@ -219,11 +219,6 @@ exports.putText = async (req, res, next) => {
       res.json({
         status: 200,
         message: "Text 업데이트 성공",
-        text: {
-          _id: textId,
-          userEmail: userId,
-          content,
-        },
       });
     } catch (error) {
       console.log(error);
