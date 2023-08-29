@@ -7,6 +7,7 @@ const cors = require("cors");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
+const { CONFIG } = require("./constants/config");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -15,12 +16,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: CONFIG.CLIENT,
     credentials: true,
   }),
 );
-
-const { CONFIG } = require("./constants/config");
 
 const connectToDatabase = async () => {
   try {
