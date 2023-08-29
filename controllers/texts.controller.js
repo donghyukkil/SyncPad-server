@@ -53,6 +53,7 @@ exports.createText = async (req, res, next) => {
         );
       }
     };
+
     saveText();
   } catch (error) {
     next(
