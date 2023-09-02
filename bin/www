@@ -37,8 +37,10 @@ io.on("connection", socket => {
     socket.join(roomId);
   });
 
-  socket.on("textChange", ({ roomId, text }) => {
-    socket.to(roomId).emit("textChanged", text);
+  socket.on("textChange", ({ roomId, text, userPhotoURL, cursorPosition }) => {
+    socket
+      .to(roomId)
+      .emit("textChanged", { text, userPhotoURL, cursorPosition });
   });
 
   socket.on("setUserName", ({ username }) => {
