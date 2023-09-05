@@ -11,7 +11,7 @@ const { isIdValid, isUserIdValid } = require("../utils");
 
 exports.createText = async (req, res, next) => {
   const { userId } = req.params;
-  const { content } = req.body;
+  const { content, backgroundColor } = req.body;
 
   if (!isUserIdValid(userId)) {
     next(createError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST));
@@ -33,6 +33,7 @@ exports.createText = async (req, res, next) => {
         const text = new Text({
           userId: user._id,
           content,
+          backgroundColor,
         });
 
         await text.save();
@@ -202,12 +203,13 @@ exports.getTexts = async (req, res, next) => {
 
 exports.putText = async (req, res, next) => {
   const { userId, textId } = req.params;
-  const { content } = req.body;
+  const { content, backgroundColor } = req.body;
 
   const updateText = async () => {
     try {
       const text = await Text.findById({ _id: textId });
       text.content = content;
+      text.backgroundColor = backgroundColor;
 
       await text.save();
 
