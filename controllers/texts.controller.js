@@ -7,7 +7,7 @@ const client = new vision.ImageAnnotatorClient();
 const Text = require("../models/Text");
 const User = require("../models/User");
 
-const { isIdValid, isUserIdValid } = require("../utils");
+const { isUserIdValid } = require("../utils");
 
 exports.createText = async (req, res, next) => {
   const { userId } = req.params;
