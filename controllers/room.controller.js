@@ -6,8 +6,7 @@ const User = require("../models/User");
 
 exports.createRoom = async (req, res, next) => {
   try {
-    const { text_id, userId } = req.body;
-
+    const { text_id, userId, roomName, text } = req.body;
     const user = await User.findOne({ email: userId });
 
     if (!user) {
@@ -21,7 +20,8 @@ exports.createRoom = async (req, res, next) => {
         const room = new Room({
           userId,
           textId: text_id,
-          roomName: text_id,
+          roomName,
+          content: text[0].content,
         });
 
         await room.save();
@@ -45,11 +45,12 @@ exports.createRoom = async (req, res, next) => {
 };
 
 exports.deleteRoom = async (req, res, next) => {
-  const { userId, roomId } = req.params;
+  const { roomId } = req.params;
 
   const deleteRooms = async () => {
     try {
-      const deleteRoom = await Room.findOneAndRemove({ roomName: roomId });
+      await Room.findOneAndRemove({ roomName: roomId });
+
       res.json({
         status: 204,
         message: "텍스트 삭제 성공",
