@@ -33,18 +33,15 @@ const io = new Server(server, {
 io.on("connection", socket => {
   console.log("User connected:", socket.id);
 
-  socket.on("joinRoom", roomId => {
+  socket.on("joinRoom", (roomId, user) => {
     socket.join(roomId);
+    socket.username = user;
   });
 
   socket.on("textChange", ({ roomId, text, userPhotoURL, cursorPosition }) => {
     socket
       .to(roomId)
       .emit("textChanged", { text, userPhotoURL, cursorPosition });
-  });
-
-  socket.on("setUserName", ({ username }) => {
-    socket.username = username;
   });
 
   socket.on("typing", roomId => {
