@@ -10,7 +10,7 @@ const http = require("http");
 
 const { Server } = require("socket.io");
 const { CONFIG } = require("../constants/config");
-
+const Room = require("../models/Room");
 /**
  * Get port from environment and store in Express.
  */
@@ -30,23 +30,34 @@ const io = new Server(server, {
   },
 });
 
+const getRoomContentByRoomName = async roomName => {
+  try {
+    const room = await Room.findOne({ roomName });
+    return room ? room.content : null;
+  } catch (error) {
+    console.error("Error fetching room content by roomName:", error);
+    return null;
+  }
+};
+
 io.on("connection", socket => {
   console.log("User connected:", socket.id);
 
-  socket.on("joinRoom", (roomId, user) => {
+  socket.on("joinRoom", async (roomId, user) => {
     socket.join(roomId);
     socket.username = user;
+
+    const roomContent = await getRoomContentByRoomName(roomId);
+    socket.emit("currentText", { text: roomContent });
   });
 
-  socket.on("textChange", ({ roomId, text, userPhotoURL, cursorPosition }) => {
+  socket.on("textChange", ({ roomId, text, user, cursorPosition }) => {
+    const email = user ? user.email : "guest";
+    const photoURL = user ? user.photoURL : "";
+
     socket
       .to(roomId)
-      .emit("textChanged", { text, userPhotoURL, cursorPosition });
-  });
-
-  socket.on("typing", roomId => {
-    const { username } = socket;
-    io.to(roomId).emit("userTyping", username);
+      .emit("textChanged", { text, email, cursorPosition, photoURL });
   });
 
   socket.on("disconnect", () => {
