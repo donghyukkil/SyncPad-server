@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 exports.createRoom = async (req, res, next) => {
   try {
-    const { text_id, userId, roomName, text } = req.body;
+    const { text_id, userId, roomId, text } = req.body;
     const user = await User.findOne({ email: userId });
 
     if (!user) {
@@ -20,7 +20,7 @@ exports.createRoom = async (req, res, next) => {
         const room = new Room({
           userId,
           textId: text_id,
-          roomName,
+          roomId,
           content: text[0].content,
         });
 
@@ -49,7 +49,7 @@ exports.deleteRoom = async (req, res, next) => {
 
   const deleteRooms = async () => {
     try {
-      await Room.findOneAndRemove({ roomName: roomId });
+      await Room.findOneAndRemove({ roomId });
 
       res.json({
         status: 204,
