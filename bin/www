@@ -5,12 +5,17 @@
  */
 
 const app = require("../app");
+
 const debug = require("debug")("server:server");
+
 const http = require("http");
 
 const { Server } = require("socket.io");
+
 const { CONFIG } = require("../constants/config");
+
 const Room = require("../models/Room");
+
 /**
  * Get port from environment and store in Express.
  */
@@ -33,9 +38,11 @@ const io = new Server(server, {
 const getRoomContentByRoomId = async roomId => {
   try {
     const room = await Room.findOne({ roomId });
+
     return room ? room.content : null;
   } catch (error) {
     console.error("Error fetching room content by roomId:", error);
+
     return null;
   }
 };
@@ -45,9 +52,11 @@ io.on("connection", socket => {
 
   socket.on("joinRoom", async (roomId, user) => {
     socket.join(roomId);
+
     socket.username = user;
 
     const roomContent = await getRoomContentByRoomId(roomId);
+
     socket.emit("currentText", { text: roomContent });
   });
 

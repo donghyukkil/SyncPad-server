@@ -10,10 +10,11 @@ const cors = require("cors");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
-const { CONFIG } = require("./constants/config");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+
+const { CONFIG } = require("./constants/config");
 
 const app = express();
 

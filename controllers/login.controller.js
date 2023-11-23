@@ -19,6 +19,7 @@ exports.post = async (req, res, next) => {
       });
 
       await newUser.save();
+
       res.cookie("accessToken", token, {
         httpOnly: true,
         sameSite: "Lax",

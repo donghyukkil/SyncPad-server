@@ -7,6 +7,7 @@ const textsController = require("../controllers/texts.controller");
 const roomController = require("../controllers/room.controller");
 
 router.post("/", loginController.post);
+
 router.post("/logout", loginController.logout);
 
 router.post("/:userId/create", textsController.createText);

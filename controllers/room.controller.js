@@ -69,6 +69,7 @@ exports.getroom = async (req, res, next) => {
 
   try {
     const rooms = await Room.find({ userId });
+
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
