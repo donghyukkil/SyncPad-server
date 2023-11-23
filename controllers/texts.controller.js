@@ -1,9 +1,12 @@
 const createError = require("http-errors");
 const { StatusCodes, ReasonPhrases } = require("http-status-codes");
-
 const vision = require("@google-cloud/vision");
 
-const client = new vision.ImageAnnotatorClient();
+const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+
+const client = new vision.ImageAnnotatorClient({
+  credentials,
+});
 
 const Text = require("../models/Text");
 const User = require("../models/User");
