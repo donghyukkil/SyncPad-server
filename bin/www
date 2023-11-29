@@ -60,13 +60,16 @@ io.on("connection", socket => {
     socket.emit("currentText", { text: roomContent });
   });
 
-  socket.on("textChange", ({ roomId, text, user, cursorPosition }) => {
+  socket.on("textChange", ({ roomId, text, user, cursorIndex, textInput }) => {
     const email = user ? user.email : "guest";
     const photoURL = user ? user.photoURL : "";
-
-    socket
-      .to(roomId)
-      .emit("textChanged", { text, email, cursorPosition, photoURL });
+    socket.to(roomId).emit("textChanged", {
+      text,
+      email,
+      photoURL,
+      cursorIndex,
+      textInput,
+    });
   });
 
   socket.on("disconnect", () => {
