@@ -24,5 +24,7 @@ node_modules/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+ServiceAccount.json
+
 bamboo-media*.json
 # bamboo-media-395402-77c8ef6587a6.json
