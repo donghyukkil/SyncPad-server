@@ -1,40 +1,45 @@
-const jwt = require("jsonwebtoken");
+const createError = require("http-errors");
+const { StatusCodes, ReasonPhrases } = require("http-status-codes");
+const admin = require("../config/firebase-config");
 
-const { CONFIG } = require("../constants/config");
+const { TEXT } = require("../constants/text");
 
-const verifyToken = (req, res, next) => {
-  const token = req.cookies.accessToken;
+const verifyToken = async (req, res, next) => {
+  const token = req.headers.authorization;
 
   if (!token) {
-    return res.json({
-      status: 400,
-      message: "Bad Request",
-      data: {
-        error: {
-          message: "Bad Request",
-          code: 400,
-        },
-      },
-    });
+    next(createError(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED));
+
+    return;
   }
 
   try {
-    const decodedToken = jwt.decode(token, CONFIG.SECRETKEY);
+    const decodeValue = await admin.auth().verifyIdToken(token);
 
-    req.token = decodedToken;
-
-    next();
+    if (decodeValue) {
+      return next();
+    }
   } catch (error) {
-    return res.json({
-      status: 401,
-      message: "Unauthorized",
-      data: {
-        error: {
-          message: "unauthorized",
-          code: 401,
-        },
-      },
-    });
+    if (error instanceof admin.auth.InvaidIdTokenError) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: TEXT.STATUS.ERROR,
+        message: "Invalid token",
+      });
+    }
+
+    if (error instanceof admin.auth.ExpiredIdTokenError) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: TEXT.STATUS.ERROR,
+        message: "Expired token",
+      });
+    }
+
+    next(
+      createError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        ReasonPhrases.INTERNAL_SERVER_ERROR,
+      ),
+    );
   }
 };
 
