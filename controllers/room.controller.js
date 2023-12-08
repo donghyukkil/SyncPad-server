@@ -49,15 +49,21 @@ exports.deleteRoom = async (req, res, next) => {
 
   const deleteRooms = async () => {
     try {
-      await Room.findOneAndRemove({ roomId });
+      const room = await Room.findOne({ roomId });
 
-      res.json({
-        status: 204,
-        message: "텍스트 삭제 성공",
-        data: null,
-      });
+      if (!room) {
+        return res.status(404).json({ error: "방을 찾을 수 없습니다." });
+      }
+
+      if (room.userId !== req.token.email) {
+        return res.status(403).json({ error: "권한이 없습니다." });
+      }
+
+      await Room.findOneAndRemove({ roomId });
+      res.status(204).json({ message: "방이 성공적으로 삭제되었습니다." });
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "서버 오류가 발생했습니다." });
     }
   };
 

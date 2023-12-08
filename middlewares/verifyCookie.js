@@ -11,7 +11,6 @@ const verifyCookie = (req, res, next) => {
 
   try {
     const decodedToken = jwt.verify(accessToken, CONFIG.SECRETKEY);
-
     req.token = decodedToken;
 
     next();
