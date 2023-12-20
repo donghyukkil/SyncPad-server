@@ -49,7 +49,7 @@ exports.deleteRoom = async (req, res, next) => {
 
   const deleteRooms = async () => {
     try {
-      const room = await Room.findOne({ roomId });
+      const room = await Room.findById(roomId);
 
       if (!room) {
         return res.status(404).json({ error: "방을 찾을 수 없습니다." });
@@ -59,7 +59,7 @@ exports.deleteRoom = async (req, res, next) => {
         return res.status(403).json({ error: "권한이 없습니다." });
       }
 
-      await Room.findOneAndRemove({ roomId });
+      await Room.findOneAndRemove({ _id: roomId });
       res.status(204).json({ message: "방이 성공적으로 삭제되었습니다." });
     } catch (error) {
       console.log(error);
