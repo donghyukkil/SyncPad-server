@@ -1,20 +1,33 @@
+import { Request, Response, NextFunction } from "express";
+import vision from "@google-cloud/vision";
+
 const createError = require("http-errors");
 const { StatusCodes, ReasonPhrases } = require("http-status-codes");
 
-const vision = require("@google-cloud/vision");
+let credentials;
 
-const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+} else {
+  console.error(
+    "GOOGLE_APPLICATION_CREDENTIALS 환경 변수가 정의되지 않았습니다.",
+  );
+}
 
 const client = new vision.ImageAnnotatorClient({
   credentials,
 });
 
-const Text = require("../models/Text");
-const User = require("../models/User");
+import Text from "../models/Text";
+import User from "../models/User";
 
-const { isUserIdValid } = require("../utils");
+const { isUserIdValid } = require("../../utils");
 
-exports.createText = async (req, res, next) => {
+export const createText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { userId } = req.params;
   const { content, backgroundColor } = req.body;
 
@@ -71,7 +84,11 @@ exports.createText = async (req, res, next) => {
   }
 };
 
-exports.uploadText = async (req, res, next) => {
+export const uploadText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { userId } = req.params;
   const base64Image = req.body.imageBase64;
 
@@ -102,20 +119,24 @@ exports.uploadText = async (req, res, next) => {
           const [result] = await client.documentTextDetection(request);
           const { fullTextAnnotation } = result;
 
-          const text = new Text({
-            userId: user._id,
-            content: fullTextAnnotation.text,
-          });
+          if (fullTextAnnotation) {
+            const text = new Text({
+              userId: user._id,
+              content: fullTextAnnotation.text,
+            });
 
-          await text.save();
+            await text.save();
 
-          res.json({
-            status: 201,
-            message: "Text created successfully",
-            data: {
-              text,
-            },
-          });
+            res.json({
+              status: 201,
+              message: "Text created successfully",
+              data: {
+                text,
+              },
+            });
+          } else {
+            res.status(404).json({ message: "Text not found in image" });
+          }
         }
       } catch (error) {
         next(
@@ -138,8 +159,13 @@ exports.uploadText = async (req, res, next) => {
   }
 };
 
-exports.getTexts = async (req, res, next) => {
-  const { per_page, page } = req.query;
+export const getTexts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const per_page = parseInt(req.query.per_page as string);
+  const page = parseInt(req.query.page as string);
   const { userId } = req.params;
 
   if (isNaN(per_page) || isNaN(page)) {
@@ -206,22 +232,29 @@ exports.getTexts = async (req, res, next) => {
   }
 };
 
-exports.putText = async (req, res, next) => {
+export const putText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { userId, textId } = req.params;
   const { content, backgroundColor } = req.body;
 
   const updateText = async () => {
     try {
       const text = await Text.findById({ _id: textId });
-      text.content = content;
-      text.backgroundColor = backgroundColor;
 
-      await text.save();
+      if (text !== null) {
+        text.content = content;
+        text.backgroundColor = backgroundColor;
 
-      res.json({
-        status: 200,
-        message: "Text 업데이트 성공",
-      });
+        await text.save();
+
+        res.json({
+          status: 200,
+          message: "Text 업데이트 성공",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -230,7 +263,11 @@ exports.putText = async (req, res, next) => {
   updateText();
 };
 
-exports.deleteText = async (req, res, next) => {
+export const deleteText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { textId } = req.params;
 
   const deleteText = async () => {
