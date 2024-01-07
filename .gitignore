@@ -26,5 +26,6 @@ node_modules/
 
 ServiceAccount.json
 
-bamboo-media*.json
-# bamboo-media-395402-77c8ef6587a6.json
+.vscode
+
+dist
