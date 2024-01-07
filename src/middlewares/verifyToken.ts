@@ -1,10 +1,13 @@
+import { Request, Response, NextFunction } from "express";
+
 const createError = require("http-errors");
 const { StatusCodes, ReasonPhrases } = require("http-status-codes");
+
 const admin = require("../config/firebase-config");
 
 const { TEXT } = require("../constants/text");
 
-const verifyToken = async (req, res, next) => {
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -43,4 +46,4 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+export default verifyToken;
