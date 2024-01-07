@@ -4,7 +4,11 @@
  * Module dependencies.
  */
 
-const app = require("../app");
+interface CustomSocket extends Socket {
+  username?: string;
+}
+
+import app from "../app";
 
 const debug = require("debug")("server:server");
 
@@ -14,7 +18,7 @@ const { Server } = require("socket.io");
 
 const { CONFIG } = require("../constants/config");
 
-const Room = require("../models/Room");
+import Room from "../models/Room";
 
 /**
  * Get port from environment and store in Express.
@@ -35,7 +39,7 @@ const io = new Server(server, {
   },
 });
 
-const getRoomContentByRoomId = async roomId => {
+const getRoomContentByRoomId = async (roomId: string) => {
   try {
     const room = await Room.findById(roomId);
     return room || null;
@@ -46,10 +50,12 @@ const getRoomContentByRoomId = async roomId => {
   }
 };
 
-io.on("connection", socket => {
+import { Socket } from "socket.io";
+
+io.on("connection", (socket: CustomSocket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("joinRoom", async (roomId, user) => {
+  socket.on("joinRoom", async (roomId: string, user: any) => {
     socket.join(roomId);
 
     socket.username = user;
@@ -88,7 +94,7 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val: string): string | number | false {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -108,7 +114,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== "listen") {
     throw error;
   }

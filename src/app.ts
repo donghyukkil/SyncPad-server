@@ -1,22 +1,20 @@
-if (process.env.NODE_ENV === "development") {
-  const dotenv = require("dotenv");
-  dotenv.config();
-}
+import dotenv from "dotenv";
 
-const path = require("path");
-const createError = require("http-errors");
-const express = require("express");
-const cors = require("cors");
-const logger = require("morgan");
-const cookieParser = require("cookie-parser");
-const mongoose = require("mongoose");
+dotenv.config();
 
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
+import express, { Request, Response, NextFunction, Express } from "express";
+import path from "path";
+import createError from "http-errors";
+import cors from "cors";
+import logger from "morgan";
+import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 
-const { CONFIG } = require("./constants/config");
+import indexRouter from "./routes/index";
+import usersRouter from "./routes/users";
+import { CONFIG } from "./constants/config";
 
-const app = express();
+const app: Express = express();
 
 app.use(
   cors({
@@ -25,9 +23,11 @@ app.use(
   }),
 );
 
-const connectToDatabase = async () => {
+const connectToDatabase = async (): Promise<void> => {
   try {
-    await mongoose.connect(CONFIG.MONGODB_URI);
+    if (CONFIG.MONGODB_URI !== undefined) {
+      await mongoose.connect(CONFIG.MONGODB_URI);
+    }
     console.log("MongoDB connected");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
@@ -47,12 +47,12 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req: Request, res: Response, next: NextFunction) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -62,4 +62,4 @@ app.use(function (err, req, res, next) {
   res.json({ error: err.message });
 });
 
-module.exports = app;
+export default app;
