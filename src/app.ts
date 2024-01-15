@@ -8,10 +8,12 @@ import createError from "http-errors";
 import cors from "cors";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
-import mongoose from "mongoose";
 
 import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
+
+import Database from "./config/database";
+
 import { CONFIG } from "./constants/config";
 
 const app: Express = express();
@@ -23,18 +25,8 @@ app.use(
   }),
 );
 
-const connectToDatabase = async (): Promise<void> => {
-  try {
-    if (CONFIG.MONGODB_URI !== undefined) {
-      await mongoose.connect(CONFIG.MONGODB_URI);
-    }
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error("MongoDB connection failed:", error);
-  }
-};
-
-connectToDatabase();
+const database = Database.getInstance();
+database.connect();
 
 app.use(logger("dev"));
 app.use(express.json({ limit: "10mb" }));
