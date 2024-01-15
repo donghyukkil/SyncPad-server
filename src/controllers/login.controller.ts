@@ -1,7 +1,21 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { CONFIG } from '../constants/config';
-import User from '../models/User';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { CONFIG } from "../constants/config";
+import User from "../models/User";
+
+class UserFactory {
+  static async createUser(email: string, secretKey: string) {
+    const token = jwt.sign({ email: email }, secretKey);
+
+    const newUser = new User({
+      email: email,
+      token,
+    });
+
+    await newUser.save();
+    return newUser;
+  }
+}
 
 export const post = async (req: Request, res: Response, next: NextFunction) => {
   const { userEmail } = req.body;
@@ -11,46 +25,39 @@ export const post = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!existingUser) {
       if (!CONFIG.SECRETKEY) {
-        throw new Error('Secret key is not defined.');
+        throw new Error("Secret key is not defined.");
       }
 
-      const token = jwt.sign({ email: userEmail }, CONFIG.SECRETKEY);
+      const newUser = await UserFactory.createUser(userEmail, CONFIG.SECRETKEY);
 
-      const newUser = new User({
-        email: userEmail,
-        token,
-      });
-
-      await newUser.save();
-
-      res.cookie('accessToken', token, {
+      res.cookie("accessToken", newUser.token, {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: "lax",
         maxAge: 3600000,
       });
 
       res.json({
         status: 201,
-        message: 'Created',
+        message: "Created",
         data: {
-          result: 'OK',
+          result: "OK",
         },
       });
 
       return;
     }
 
-    res.cookie('accessToken', existingUser.token, {
+    res.cookie("accessToken", existingUser.token, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: "lax",
       maxAge: 3600000,
     });
 
     res.json({
       status: 200,
-      message: 'OK',
+      message: "OK",
       data: {
-        result: 'OK',
+        result: "OK",
       },
     });
   } catch (error) {
@@ -65,13 +72,13 @@ export const logout = async (
   res: Response,
   next: NextFunction,
 ) => {
-  res.clearCookie('accessToken');
+  res.clearCookie("accessToken");
 
   res.send({
     status: 200,
-    message: 'Logged out successfully',
+    message: "Logged out successfully",
     data: {
-      result: 'OK',
+      result: "OK",
     },
   });
 };
